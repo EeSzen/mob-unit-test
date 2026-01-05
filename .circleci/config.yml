@@ -9,27 +9,25 @@ jobs:
       name: android/android_machine
       tag: default
     steps:
-      # Checkout the code as the first step.
       - checkout
       - restore_cache:
-        keys:
-          - gradle-{{ checksum "build.gradle.kts" }} - {{ checksum "app/build.gradle.kts" }}
-          - gradle -
+          keys:
+            - gradle-{{ checksum "build.gradle.kts" }} - {{ checksum "app/build.gradle.kts" }}
+            - gradle-
       - run:
-        name: Change permission for gradlew
-        command: chmod +x gradlew
+          name: Change permission for gradlew
+          command: chmod +x gradlew
       - run:
           name: Resolve all the dependencies
           command: ./gradlew dependencies
       - save_cache:
-        paths:
-          - ~/.gradle
-        key: gradle- {{ checksum "build.gradle.kts" }} - {{ checksum "app/build.gradle.kts }}
-      - android/run-tests:
-        test_command: ./gradlew testDebugUnitTest
+          paths:
+            - ~/.gradle
+          key: gradle-{{ checksum "build.gradle.kts" }} - {{ checksum "app/build.gradle.kts" }}
+      - run:
+          name: Run Unit Test
+          command: ./gradlew testDebugUnitTest
 
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
 workflows:
   run-unit-test:
     jobs:
